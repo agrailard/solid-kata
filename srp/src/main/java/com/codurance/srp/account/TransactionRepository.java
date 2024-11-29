@@ -1,4 +1,4 @@
-package com.codurance.srp;
+package com.codurance.srp.account;
 
 import java.util.List;
 

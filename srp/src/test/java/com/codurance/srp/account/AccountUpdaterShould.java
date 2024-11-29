@@ -1,6 +1,8 @@
-package com.codurance.srp;
+package com.codurance.srp.account;
 
 
+import com.codurance.srp.Clock;
+import com.codurance.srp.Console;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +20,7 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AccountServiceShould {
+public class AccountUpdaterShould {
 
     private static final int POSITIVE_AMOUNT = 100;
     private static final int NEGATIVE_AMOUNT = -POSITIVE_AMOUNT;
@@ -38,11 +40,14 @@ public class AccountServiceShould {
     @Mock
     private Console console;
 
-    private AccountService accountService;
+    private AccountUpdater accountUpdater;
+
+    private AccountReader accountReader;
 
     @Before
     public void setUp() {
-        accountService = new AccountService(transactionRepository, clock, console);
+        accountUpdater = new AccountUpdater(transactionRepository, clock);
+        accountReader = new AccountReader(console, transactionRepository);
         given(clock.today()).willReturn(TODAY);
     }
 
@@ -50,7 +55,7 @@ public class AccountServiceShould {
     @Test
     public void deposit_amount_into_the_account() {
 
-        accountService.deposit(POSITIVE_AMOUNT);
+        accountUpdater.deposit(POSITIVE_AMOUNT);
 
         verify(transactionRepository).add(refEq(new Transaction(TODAY, POSITIVE_AMOUNT)));
     }
@@ -59,7 +64,7 @@ public class AccountServiceShould {
     @Test
     public void withdraw_amount_from_the_account() {
 
-        accountService.withdraw(POSITIVE_AMOUNT);
+        accountUpdater.withdraw(POSITIVE_AMOUNT);
 
         verify(transactionRepository).add(refEq(new Transaction(TODAY, NEGATIVE_AMOUNT)));
     }
@@ -68,7 +73,7 @@ public class AccountServiceShould {
     public void print_statement() {
         given(transactionRepository.all()).willReturn(TRANSACTIONS);
 
-        accountService.printStatement();
+        accountReader.printStatement();
 
         InOrder inOrder = inOrder(console);
         inOrder.verify(console).printLine("DATE | AMOUNT | BALANCE");
