@@ -26,14 +26,14 @@ public class BirthdayGreeterShould {
     @Mock
     private Clock clock;
 
-    @InjectMocks
-    private BirthdayGreeter birthdayGreeter;
-
 
     private ByteArrayOutputStream consoleContent = new ByteArrayOutputStream();
 
     @Test
     public void should_send_greeting_email_to_employee() {
+
+        BirthdayGreeter birthdayGreeter = new BirthdayGreeter(employeeRepository, clock, new LogEmailSender());
+
         System.setOut(new PrintStream(consoleContent));
         given(clock.monthDay()).willReturn(TODAY);
         Employee employee = anEmployee().build();
